@@ -6,9 +6,17 @@ import streamlit as st
 from file_utils import detect_language, chunk_code, needs_chunking
 from voice_utils import mic_button, voice_chat_widget, speak_text, stop_speaking_button
 
-# ---------- Setup ----------
 load_dotenv()
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+groq_api_key = os.getenv("GROQ_API_KEY") or st.secrets.get("GROQ_API_KEY")
+
+if not groq_api_key:
+    st.error(
+        "GROQ_API_KEY not found. Locally: add it to your .env file. "
+        "On Streamlit Cloud: add it under Settings → Secrets."
+    )
+    st.stop()
+
+client = Groq(api_key=groq_api_key)
 
 st.set_page_config(page_title="Codelens — AI Code Review", page_icon="◆", layout="wide")
 
@@ -47,12 +55,6 @@ reasonably concise — a few sentences for simple questions, more only if the qu
 genuinely needs depth. Avoid heavy markdown formatting like tables or code blocks
 unless the user specifically asks for code, since your answer will be read aloud."""
 
-# ============================================================
-# DESIGN SYSTEM — "Diagnostics panel" aesthetic
-# Dark editor background, monospace accents, IDE-style severity
-# colors (the same red/amber/green every developer already reads
-# as error/warning/pass from their own tools).
-# ============================================================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
@@ -309,11 +311,7 @@ def assistant_reply(question: str) -> str:
         max_tokens=400,
     )
     return response.choices[0].message.content
-
-
-# ============================================================
 # UI
-# ============================================================
 st.markdown("""
 <div class="codelens-header">
     <div class="codelens-logo">◆ Code<span>lens</span></div>
@@ -371,7 +369,6 @@ with tab_review:
 
     st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
-    # ---------- Run review ----------
     if review_clicked:
         if not code_input.strip():
             st.warning("Paste some code or upload a file first.")
@@ -454,10 +451,6 @@ with tab_review:
 
             st.session_state["chat_history"].append({"role": "assistant", "content": full_reply})
 
-
-# ============================================================
-# VOICE ASSISTANT TAB — general Q&A, separate from code review
-# ============================================================
 with tab_assistant:
     st.markdown(
         '<div class="panel-label">General voice assistant — ask anything</div>',
@@ -471,7 +464,7 @@ with tab_assistant:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Big central mic button
+    # mic button
     voice_chat_widget(key="voice_assistant")
     stop_speaking_button(key="stop_assistant_speak")
     voice_assistant_text = st.query_params.get("voice_assistant", "")

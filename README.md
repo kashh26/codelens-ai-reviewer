@@ -27,14 +27,14 @@ There's also a separate Voice Assistant tab — a general-purpose voice Q&A feat
 
 *Tech stack
 
-Layer              Tool
-Language           Python 3.9+
-LLML               lama 3.3 70B via Groq API (free tier)
-Frontend / UI      Streamlit + custom CSS
-Voice (STT / TTS)  Browser Web Speech API — no key, no cost
-Env management     python-dotenv (local) · Streamlit Secrets (cloud)
-Version control    Git + GitHub
-Deployment         Streamlit Community Cloud
+Layer               Tool
+Language            Python 3.9+
+LLML                lama 3.3 70B via Groq API (free tier)
+Frontend / UI       Streamlit + custom CSS
+Voice (STT / TTS)   Browser Web Speech API — no key, no cost
+Env management      python-dotenv (local) · Streamlit Secrets (cloud)
+Version control     Git + GitHub
+Deployment          Streamlit Community Cloud
 
 *Project structure
 
